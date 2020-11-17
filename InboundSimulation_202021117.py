@@ -27,10 +27,10 @@ def simulate(data, truck_volume, site_operation, shuttle, plant_operation, speed
                 if site not in finish_list:
                     site_volume = float(fil_area[fil_area.提货点 == site]['日均流量'])
                     shift = int(fil_area[fil_area.提货点 == site]['班次'])
-                    VMI = int(fil_area[fil_area.提货点 == site]['是否VMI'])
+                    vmi = int(fil_area[fil_area.提货点 == site]['是否VMI'])
                     distance = int(fil_area[fil_area.提货点 == site]['距离'])
 
-                    if VMI or (site_volume / shift) / 2 >= truck_volume:
+                    if vmi or (site_volume / shift) / 2 >= truck_volume:
                         route_count += 1
                         route_num = route_count
                         route_volume = site_volume
