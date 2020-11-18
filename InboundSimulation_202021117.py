@@ -26,7 +26,6 @@ def simulate(data, truck_volume, deviation, site_operation, shuttle, plant_opera
                 if site not in finish_list:
                     site_volume = float(fil_region[fil_region.提货点 == site]['日均流量'])
                     shift = int(fil_region[fil_region.提货点 == site]['班次'])
-                    vmi = int(fil_region[fil_region.提货点 == site]['是否VMI'])
                     distance = int(fil_region[fil_region.提货点 == site]['距离'])
 
                     # 提货点单班流量大于2车
@@ -34,7 +33,7 @@ def simulate(data, truck_volume, deviation, site_operation, shuttle, plant_opera
                         route_count += 1
                         route_num = route_count
                         route_volume = site_volume
-                        trip_round = math.ceil(site_volume / shift / truck_volume)
+                        trip_round = round(site_volume / shift / truck_volume)
                         utilization = site_volume / shift / (truck_volume / 0.7 * trip_round)  # 还原到卡车理论容积再运算
                         if distance <= 50:
                             trip_time = (distance / speed_close) * 2 + site_operation + plant_operation
