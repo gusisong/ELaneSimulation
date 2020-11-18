@@ -29,8 +29,8 @@ def simulate(data, truck_volume, deviation, site_operation, shuttle, plant_opera
                     vmi = int(fil_region[fil_region.提货点 == site]['是否VMI'])
                     distance = int(fil_region[fil_region.提货点 == site]['距离'])
 
-                    # VMI或提货点单班流量大于2车
-                    if vmi or (site_volume / shift) / 2 >= truck_volume:
+                    # 提货点单班流量大于2车
+                    if site_volume / shift / 2 >= truck_volume:
                         route_count += 1
                         route_num = route_count
                         route_volume = site_volume
@@ -45,6 +45,7 @@ def simulate(data, truck_volume, deviation, site_operation, shuttle, plant_opera
                         finish_list.append(site)
 
                     else:
+                        # 排除VMI和已规划过的提货点
                         exclude = set(finish_list + vmi_list)
                         search_range = [item for item in pickup_list if item not in exclude][1:]
 
