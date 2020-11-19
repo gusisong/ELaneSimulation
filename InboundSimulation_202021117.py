@@ -17,9 +17,7 @@ def simulate(data, truck_volume, loading_rate, deviation, site_operation, shuttl
         region_list = list(set(fil_plant['提货区域']))
         for region in region_list:
             fil_region = fil_plant[fil_plant.提货区域 == region]
-
             pickup_list = list(fil_region['提货点'])
-
             finish_list = []
             vmi_list = list(fil_region[fil_region.是否VMI == 1]['提货点'])
             for site in pickup_list:
@@ -44,7 +42,6 @@ def simulate(data, truck_volume, loading_rate, deviation, site_operation, shuttl
                         else:
                             trip_time = (distance / speed_far) * 2 + site_operation + plant_operation
                         truck_demand = math.ceil(trip_round * trip_time / 10)
-
                         vmi_tag = 'Y' if vmi else 'N'
 
                         result.append([plant, region, route_num, site, vmi_tag, site_volume, route_volume, utilization, trip_round, trip_time, truck_demand])
@@ -75,9 +72,7 @@ def simulate(data, truck_volume, loading_rate, deviation, site_operation, shuttl
                                             route_num = route_count
                                             trip_round = 2
                                             utilization = route_volume / shift / (truck_volume / loading_rate * trip_round)  # 还原到卡车理论容积再运算
-
                                             truck_demand = math.ceil(trip_round * trip_time / 10)
-
                                             vmi_tag = 'N'
 
                                             result.append([plant, region, route_num, site, vmi_tag, site_volume, route_volume, utilization, trip_round, trip_time, truck_demand])
@@ -104,9 +99,7 @@ def simulate(data, truck_volume, loading_rate, deviation, site_operation, shuttl
                                                 route_num = route_count
                                                 trip_round = 3
                                                 utilization = route_volume / shift / (truck_volume / loading_rate * trip_round)  # 还原到卡车理论容积再运算
-
                                                 truck_demand = math.ceil(trip_round * trip_time / 10)
-
                                                 vmi_tag = 'N'
 
                                                 result.append([plant, region, route_num, site, vmi_tag, site_volume, route_volume, utilization, trip_round, trip_time, truck_demand])
@@ -137,14 +130,16 @@ def simulate(data, truck_volume, loading_rate, deviation, site_operation, shuttl
                                                     route_num = route_count
                                                     trip_round = 2
                                                     utilization = route_volume / shift / (truck_volume / loading_rate * trip_round)  # 还原到卡车理论容积再运算
-
                                                     truck_demand = math.ceil(trip_round * trip_time / 10)
-
                                                     vmi_tag = 'N'
 
                                                     result.append([plant, region, route_num, site, vmi_tag, site_volume, route_volume, utilization, trip_round, trip_time, truck_demand])
                                                     result.append([plant, region, route_num, i, vmi_tag, i_volume, route_volume, utilization, trip_round, trip_time, truck_demand])
                                                     result.append([plant, region, route_num, j, vmi_tag, j_volume, route_volume, utilization, trip_round, trip_time, truck_demand])
+
+                                                    print('3提货点:' + site)
+                                                    print(search_range)
+                                                    print(search_range[1:])
 
                                                     finish_list.append(site)
                                                     finish_list.append(i)
@@ -247,8 +242,7 @@ def simulate(data, truck_volume, loading_rate, deviation, site_operation, shuttl
 
                                             vmi_tag = 'N'
 
-                                            result.append(
-                                                [plant, region, route_num, site, vmi_tag, site_volume, route_volume, utilization, trip_round, trip_time, truck_demand])
+                                            result.append([plant, region, route_num, site, vmi_tag, site_volume, route_volume, utilization, trip_round, trip_time, truck_demand])
                                             result.append([plant, region, route_num, i, vmi_tag, i_volume, route_volume, utilization, trip_round, trip_time, truck_demand])
                                             result.append([plant, region, route_num, j, vmi_tag, j_volume, route_volume, utilization, trip_round, trip_time, truck_demand])
 
@@ -257,6 +251,37 @@ def simulate(data, truck_volume, loading_rate, deviation, site_operation, shuttl
                                             finish_list.append(j)
                                             break
                                 break
+
+            # 其余站点合并规划
+            route_count += 1
+            route_num = route_count
+
+            rest_volume = 0
+            rest_site = 0
+            for site in pickup_list:
+                if site not in finish_list:
+                    site_volume = float(fil_region[fil_region.提货点 == site]['日均流量'])
+                    rest_volume += site_volume
+                    rest_site += 1
+
+            for site in pickup_list:
+                if site not in finish_list:
+                    site_volume = float(fil_region[fil_region.提货点 == site]['日均流量'])
+                    shift = int(fil_region[fil_region.提货点 == site]['班次'])
+                    distance = int(fil_region[fil_region.提货点 == site]['距离'])
+                    trip_round = 2
+                    utilization = rest_volume / shift / (truck_volume * math.ceil(rest_site / 5) / loading_rate * trip_round)  # 还原到卡车理论容积再运算
+
+                    if distance <= 50:
+                        trip_time = site_operation * (rest_site / math.ceil(rest_site / 5)) + shuttle * (rest_site / math.ceil(rest_site / 5) - 1) + plant_operation + (distance / speed_close) * 2
+                    else:
+                        trip_time = site_operation * (rest_site / math.ceil(rest_site / 5)) + shuttle * (rest_site / math.ceil(rest_site / 5) - 1) + plant_operation + (distance / speed_far) * 2
+
+                    truck_demand = math.ceil(trip_round * trip_time / 10) * math.ceil(rest_site / 5)
+
+                    vmi_tag = 'N'
+
+                    result.append([plant, region, route_num, site, vmi_tag, site_volume, rest_volume, utilization, trip_round, trip_time, truck_demand])
 
     result_df = pd.DataFrame(result)
     result_df.columns = ['Plant', 'Region', 'RouteNum', 'Site', 'VMI', 'SiteVolume', 'RouteVolume', 'Utilization', 'TripRound', 'TripTime', 'TruckDemand']
@@ -272,7 +297,7 @@ def main():
     shuttle = 0.25
     plant_operation = 0.25 + 0.5
     speed_close = 25
-    speed_far = 40
+    speed_far = 50
     simulate(data, truck_volume, loading_rate, deviation, site_operation, shuttle, plant_operation, speed_close, speed_far)
 
 
