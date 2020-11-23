@@ -1,3 +1,9 @@
+'''
+Author: Gu Sisong
+Version: 20201123
+Updates: 代码封装
+'''
+
 import pandas as pd
 import math
 
