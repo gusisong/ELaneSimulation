@@ -1,7 +1,7 @@
 '''
 Author: Gu Sisong
 Version: 20201123
-Updates: 代码封装
+Updates: 修正MR3逻辑
 '''
 
 import pandas as pd
@@ -117,9 +117,12 @@ def simulate(data, truck_volume, loading_rate, deviation, site_operation, shuttl
 
                         # 提货点流量小于1车，模拟三拼
                         if site_volume / shift < truck_volume:
+                            success = False
                             if search_range:
                                 for i in search_range:
                                     if search_range[1:]:
+                                        if success == True:
+                                            break
                                         for j in search_range[1:]:
                                             i_volume = float(fil_region[fil_region.提货点 == i]['日均流量'])
                                             j_volume = float(fil_region[fil_region.提货点 == j]['日均流量'])
@@ -143,15 +146,16 @@ def simulate(data, truck_volume, loading_rate, deviation, site_operation, shuttl
                                                     result.append([plant, region, route_num, i, vmi_tag, i_volume, route_volume, utilization, trip_round, trip_time, truck_demand])
                                                     result.append([plant, region, route_num, j, vmi_tag, j_volume, route_volume, utilization, trip_round, trip_time, truck_demand])
 
-                                                    print('3提货点:' + site)
+                                                    print('3提货点:' + str(site))
                                                     print(search_range)
                                                     print(search_range[1:])
 
                                                     finish_list.append(site)
                                                     finish_list.append(i)
                                                     finish_list.append(j)
+
+                                                    success = True
                                                     break
-                                    break
 
             # 在剩余站点中规划需要多部卡车运作的线路
             for site in pickup_list:
@@ -225,9 +229,12 @@ def simulate(data, truck_volume, loading_rate, deviation, site_operation, shuttl
 
                     # 提货点流量小于1车，模拟三拼
                     if site_volume / shift < truck_volume:
+                        success = False
                         if search_range:
                             for i in search_range:
                                 if search_range[1:]:
+                                    if success == True:
+                                        break
                                     for j in search_range[1:]:
                                         i_volume = float(fil_region[fil_region.提货点 == i]['日均流量'])
                                         j_volume = float(fil_region[fil_region.提货点 == j]['日均流量'])
@@ -252,11 +259,16 @@ def simulate(data, truck_volume, loading_rate, deviation, site_operation, shuttl
                                             result.append([plant, region, route_num, i, vmi_tag, i_volume, route_volume, utilization, trip_round, trip_time, truck_demand])
                                             result.append([plant, region, route_num, j, vmi_tag, j_volume, route_volume, utilization, trip_round, trip_time, truck_demand])
 
+                                            print('3提货点:' + str(site))
+                                            print(search_range)
+                                            print(search_range[1:])
+
                                             finish_list.append(site)
                                             finish_list.append(i)
                                             finish_list.append(j)
+
+                                            success = True
                                             break
-                                break
 
             # 其余站点合并规划
             route_count += 1
