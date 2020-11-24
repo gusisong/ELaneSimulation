@@ -138,7 +138,7 @@ def simulate(data, truck_volume, loading_rate, deviation, site_operation, shuttl
                             if search_range:
                                 for n, i in enumerate(search_range):
                                     if search_range[(n + 1):]:
-                                        if success == True:
+                                        if success:
                                             break
                                         for j in search_range[(n + 1):]:
                                             i_volume = float(fil_region[fil_region.提货点 == i]['日均流量'])
@@ -275,7 +275,7 @@ def simulate(data, truck_volume, loading_rate, deviation, site_operation, shuttl
                         if search_range:
                             for n, i in enumerate(search_range):
                                 if search_range[(n + 1):]:
-                                    if success == True:
+                                    if success:
                                         break
                                     for j in search_range[(n + 1):]:
                                         i_volume = float(fil_region[fil_region.提货点 == i]['日均流量'])

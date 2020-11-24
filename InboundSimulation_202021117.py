@@ -137,7 +137,7 @@ def simulate(data, truck_volume, loading_rate, deviation, site_operation, shuttl
                                                     result.append([plant, region, route_num, i, vmi_tag, i_volume, route_volume, utilization, trip_round, trip_time, truck_demand])
                                                     result.append([plant, region, route_num, j, vmi_tag, j_volume, route_volume, utilization, trip_round, trip_time, truck_demand])
 
-                                                    print('3提货点:' + site)
+                                                    print('3提货点:' + str(site))
                                                     print(search_range)
                                                     print(search_range[1:])
 
@@ -145,7 +145,7 @@ def simulate(data, truck_volume, loading_rate, deviation, site_operation, shuttl
                                                     finish_list.append(i)
                                                     finish_list.append(j)
                                                     break
-                                    break
+                                        break
 
             # 在剩余站点中规划需要多部卡车运作的线路
             for site in pickup_list:
@@ -246,11 +246,15 @@ def simulate(data, truck_volume, loading_rate, deviation, site_operation, shuttl
                                             result.append([plant, region, route_num, i, vmi_tag, i_volume, route_volume, utilization, trip_round, trip_time, truck_demand])
                                             result.append([plant, region, route_num, j, vmi_tag, j_volume, route_volume, utilization, trip_round, trip_time, truck_demand])
 
+                                            print('3提货点:' + str(site))
+                                            print(search_range)
+                                            print(search_range[1:])
+
                                             finish_list.append(site)
                                             finish_list.append(i)
                                             finish_list.append(j)
                                             break
-                                break
+                                    break
 
             # 其余站点合并规划
             route_count += 1
@@ -291,7 +295,7 @@ def simulate(data, truck_volume, loading_rate, deviation, site_operation, shuttl
 def main():
     data = pd.read_excel('Template.xlsx')
     loading_rate = 0.65
-    truck_volume = 9.6 * 2.35 * 2.4 * loading_rate
+    truck_volume = 9.6 * 2.4 * 2.5 * loading_rate
     deviation = 0.05
     site_operation = 0.25 + 0.25
     shuttle = 0.25
