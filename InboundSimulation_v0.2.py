@@ -8,8 +8,7 @@ import pandas as pd
 import math
 
 
-def simulate(data, truck_volume, loading_rate, deviation, site_operation, shuttle, plant_operation, speed_close,
-             speed_far):
+def simulate(data, truck_volume, loading_rate, deviation, site_operation, shuttle, plant_operation, speed_close, speed_far):
     # 流量降序
     data.sort_values(by='日均流量', axis=0, ascending=False, inplace=True)
     result = []
