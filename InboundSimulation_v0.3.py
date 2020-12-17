@@ -27,7 +27,7 @@ def simulate(data, truck_volume, loading_rate, deviation, site_operation, shuttl
             pickup_list = list(fil_region['提货点'])
             finish_list = []
             vmi_list = list(fil_region[fil_region.是否VMI == 1]['提货点'])
-            for site in pickup_list:
+            for n, site in enumerate(pickup_list):
                 if site not in finish_list:
                     site_volume = float(fil_region[fil_region.提货点 == site]['日均流量'])
                     shift = int(fil_region[fil_region.提货点 == site]['班次'])
@@ -61,7 +61,7 @@ def simulate(data, truck_volume, loading_rate, deviation, site_operation, shuttl
                     else:
                         # 排除VMI和已规划过的提货点
                         exclude = set(finish_list + vmi_list)
-                        search_range = [item for item in pickup_list if item not in exclude][1:]
+                        search_range = [item for item in pickup_list[n:] if item not in exclude][1:]
 
                         if search_range:
                             success = False
@@ -177,9 +177,9 @@ def simulate(data, truck_volume, loading_rate, deviation, site_operation, shuttl
 
                         result.append([plant, region, route_num, route_type, site, vmi_tag, site_volume, rest_volume, utilization, trip_round, trip_time, truck_demand])
 
-                        result_df = pd.DataFrame(result)
-                        result_df.columns = ['Plant', 'Region', 'RouteNum', 'RouteType', 'Site', 'VMI', 'SiteVolume', 'RouteVolume', 'Utilization', 'TripRound', 'TripTime', 'TruckDemand']
-                        result_df.to_csv('Simulation.csv', index=False, encoding='GB2312')
+    result_df = pd.DataFrame(result)
+    result_df.columns = ['Plant', 'Region', 'RouteNum', 'RouteType', 'Site', 'VMI', 'SiteVolume', 'RouteVolume', 'Utilization', 'TripRound', 'TripTime', 'TruckDemand']
+    result_df.to_csv('Simulation.csv', index=False, encoding='GB2312')
 
 
 def main():

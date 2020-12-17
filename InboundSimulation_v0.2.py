@@ -26,7 +26,7 @@ def simulate(data, truck_volume, loading_rate, deviation, site_operation, shuttl
             pickup_list = list(fil_region['提货点'])
             finish_list = []
             vmi_list = list(fil_region[fil_region.是否VMI == 1]['提货点'])
-            for site in pickup_list:
+            for n, site in enumerate(pickup_list):
                 if site not in finish_list:
                     site_volume = float(fil_region[fil_region.提货点 == site]['日均流量'])
                     shift = int(fil_region[fil_region.提货点 == site]['班次'])
@@ -57,7 +57,7 @@ def simulate(data, truck_volume, loading_rate, deviation, site_operation, shuttl
                     else:
                         # 排除VMI和已规划过的提货点
                         exclude = set(finish_list + vmi_list)
-                        search_range = [item for item in pickup_list if item not in exclude][1:]
+                        search_range = [item for item in pickup_list[n:] if item not in exclude][1:]
 
                         # 提货点单班流量大于1车，模拟双拼
                         if site_volume / shift >= truck_volume:
@@ -159,7 +159,7 @@ def simulate(data, truck_volume, loading_rate, deviation, site_operation, shuttl
                                                     break
 
             # 在剩余站点中规划需要多部卡车运作的线路
-            for site in pickup_list:
+            for n, site in enumerate(pickup_list):
                 if site not in finish_list:
                     site_volume = float(fil_region[fil_region.提货点 == site]['日均流量'])
                     shift = int(fil_region[fil_region.提货点 == site]['班次'])
@@ -167,7 +167,7 @@ def simulate(data, truck_volume, loading_rate, deviation, site_operation, shuttl
 
                     # 排除VMI和已规划过的提货点
                     exclude = set(finish_list + vmi_list)
-                    search_range = [item for item in pickup_list if item not in exclude][1:]
+                    search_range = [item for item in pickup_list[n:] if item not in exclude][1:]
 
                     # 提货点单班流量大于1车，模拟双拼
                     if site_volume / shift >= truck_volume:
